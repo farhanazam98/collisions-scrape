@@ -1,0 +1,60 @@
+name: NYC Collision Data Scraper
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # Runs at midnight UTC daily
+  workflow_dispatch:      # Allows manual trigger
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+        
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pandas sodapy requests
+        
+    - name: Scrape data
+      run: |
+        python -m pip install --upgrade pip
+        cat << EOF > scrape.py
+        from sodapy import Socrata
+        import pandas as pd
+        from datetime import datetime
+        
+        # Initialize Socrata client
+        client = Socrata("data.cityofnewyork.us", None)
+        
+        # Get today's date for filename
+        today = datetime.now().strftime('%Y-%m-%d')
+        
+        # Fetch data - limit to last 24 hours
+        results = client.get("h9gi-nx95", 
+                           where="crash_date >= '" + 
+                           datetime.now().strftime('%Y-%m-%d') + "'",
+                           limit=50000)
+        
+        # Convert to pandas DataFrame
+        df = pd.DataFrame.from_records(results)
+        
+        # Save to CSV
+        output_file = f'nyc_collisions_{today}.csv'
+        df.to_csv(output_file, index=False)
+        print(f"Data saved to {output_file}")
+        EOF
+        python scrape.py
+        
+    - name: Commit and push if changes
+      run: |
+        git config --local user.email "github-actions[bot]@users.noreply.github.com"
+        git config --local user.name "github-actions[bot]"
+        git add *.csv
+        git diff --quiet && git diff --staged --quiet || (git commit -m "Update collision data for $(date +'%Y-%m-%d')" && git push)
