@@ -5,13 +5,11 @@ import sys
 import json
 
 try:
-    # Initialize Socrata client
     client = Socrata("data.cityofnewyork.us", None)
     
-    # Get today's date for filename
     today = datetime.now().strftime('%Y-%m-%d')
     
-    # Query for most recent records
+    # only pulling 1K for now. will probably need a key to bump this up? 
     query = """
     SELECT *
     ORDER BY crash_date DESC
@@ -24,24 +22,19 @@ try:
         print("Error: No data retrieved!")
         sys.exit(1)
     
-    # Convert to pandas DataFrame
     df = pd.DataFrame.from_records(results)
     
-    # Clean up location field
     if 'location' in df.columns:
         df['location'] = df['location'].apply(lambda x: json.dumps(x) if isinstance(x, dict) else x)
     
-    # Print data validation info
     print(f"Retrieved {len(df)} records")
     print(f"Date range: {df['crash_date'].min()} to {df['crash_date'].max()}")
     print(f"Boroughs represented: {df['borough'].unique().tolist()}")
     
-    # Save to CSV
     output_file = f'nyc_collisions_{today}.csv'
     df.to_csv(output_file, index=False)
     print(f"Data saved to {output_file}")
     
-    # Create a simple summary file
     summary = {
         'record_count': len(df),
         'date_range': {
