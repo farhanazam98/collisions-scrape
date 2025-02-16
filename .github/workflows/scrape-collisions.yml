@@ -2,8 +2,8 @@ name: NYC Collision Data Scraper
 
 on:
   schedule:
-    - cron: '0 0 * * *'  # midnight UTC 
-  workflow_dispatch:      # can also trigger 
+    - cron: '0 0 * * *'  # still midnight
+  workflow_dispatch:      # mostly for testing
 
 jobs:
   scrape:
@@ -27,11 +27,14 @@ jobs:
         pip install pandas sodapy requests
         
     - name: Run scraper
-      run: python scrape.py
+      run: |
+        # remove old csv and put in new one 
+        rm -f latest_collisions.csv
+        python scrape.py
         
     - name: Commit and push if changes
       run: |
         git config --local user.email "github-actions[bot]@users.noreply.github.com"
         git config --local user.name "github-actions[bot]"
-        git add *.csv
-        git diff --quiet && git diff --staged --quiet || (git commit -m "Update collision data for $(date +'%Y-%m-%d')" && git push)
+        git add latest_collisions.csv
+        git diff --quiet && git diff --staged --quiet || (git commit -m "Update collision data $(date +'%Y-%m-%d %H:%M:%S')" && git push)

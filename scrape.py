@@ -31,7 +31,7 @@ try:
     print(f"Date range: {df['crash_date'].min()} to {df['crash_date'].max()}")
     print(f"Boroughs represented: {df['borough'].unique().tolist()}")
     
-    output_file = f'nyc_collisions_{today}.csv'
+    output_file = 'latest_collisions.csv'
     df.to_csv(output_file, index=False)
     print(f"Data saved to {output_file}")
     
