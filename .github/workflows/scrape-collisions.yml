@@ -8,10 +8,14 @@ on:
 jobs:
   scrape:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write    # Explicitly set write permissions
     
     steps:
     - uses: actions/checkout@v4
-    
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}  # Use built-in token
+        
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
