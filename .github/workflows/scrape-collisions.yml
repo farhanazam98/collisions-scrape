@@ -9,12 +9,12 @@ jobs:
   scrape:
     runs-on: ubuntu-latest
     permissions:
-      contents: write    # Explicitly set write permissions
+      contents: write
     
     steps:
     - uses: actions/checkout@v4
       with:
-        token: ${{ secrets.GITHUB_TOKEN }}  # Use built-in token
+        token: ${{ secrets.GITHUB_TOKEN }}
         
     - name: Set up Python
       uses: actions/setup-python@v5
@@ -32,27 +32,51 @@ jobs:
         cat << EOF > scrape.py
         from sodapy import Socrata
         import pandas as pd
-        from datetime import datetime
-        
-        # Initialize Socrata client
-        client = Socrata("data.cityofnewyork.us", None)
-        
-        # Get today's date for filename
-        today = datetime.now().strftime('%Y-%m-%d')
-        
-        # Fetch data - limit to last 24 hours
-        results = client.get("h9gi-nx95", 
-                           where="crash_date >= '" + 
-                           datetime.now().strftime('%Y-%m-%d') + "'",
-                           limit=50000)
-        
-        # Convert to pandas DataFrame
-        df = pd.DataFrame.from_records(results)
-        
-        # Save to CSV
-        output_file = f'nyc_collisions_{today}.csv'
-        df.to_csv(output_file, index=False)
-        print(f"Data saved to {output_file}")
+        from datetime import datetime, timedelta
+        import sys
+
+        try:
+            # Initialize Socrata client
+            client = Socrata("data.cityofnewyork.us", None)
+            
+            # Get date range for last 24 hours
+            end_date = datetime.now()
+            start_date = end_date - timedelta(days=1)
+            
+            print(f"Fetching data from {start_date.strftime('%Y-%m-%d')} to {end_date.strftime('%Y-%m-%d')}")
+            
+            # Fetch data for last 24 hours - using crash_date
+            query = f"crash_date >= '{start_date.strftime('%Y-%m-%d')}'"
+            print(f"Query: {query}")
+            
+            results = client.get("h9gi-nx95", 
+                               where=query,
+                               limit=50000)
+            
+            print(f"Retrieved {len(results)} records")
+            
+            if not results:
+                print("Warning: No data retrieved!")
+                sys.exit(1)
+            
+            # Convert to pandas DataFrame
+            df = pd.DataFrame.from_records(results)
+            
+            # Basic data validation
+            print(f"DataFrame shape: {df.shape}")
+            print("\nColumns:")
+            print(df.columns.tolist())
+            print("\nSample of data:")
+            print(df.head())
+            
+            # Save to CSV
+            output_file = f'nyc_collisions_{end_date.strftime("%Y-%m-%d")}.csv'
+            df.to_csv(output_file, index=False)
+            print(f"\nData saved to {output_file}")
+            
+        except Exception as e:
+            print(f"Error occurred: {str(e)}")
+            sys.exit(1)
         EOF
         python scrape.py
         
