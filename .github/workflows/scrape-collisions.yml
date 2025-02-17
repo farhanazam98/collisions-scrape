@@ -24,7 +24,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install pandas sodapy requests
+        pip install pandas sodapy requests geopandas shapely
         
     - name: Run scraper
       run: |
