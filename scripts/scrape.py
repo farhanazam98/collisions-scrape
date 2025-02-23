@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 
 import pandas as pd
 from district_helper import assign_districts, load_data
-from send_mail import send_crash_summary
+from send_mail import send_crash_summary_email
 from sodapy import Socrata
 
 try:
@@ -71,7 +71,7 @@ try:
         "boroughs": df["borough"].value_counts().to_dict(),
     }
 
-    send_crash_summary(summary)
+    send_crash_summary_email(summary)
 
     with open(f"summary_{today}.json", "w") as f:
         json.dump(summary, f, indent=2)
