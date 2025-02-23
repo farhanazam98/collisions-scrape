@@ -4,9 +4,10 @@ from datetime import datetime
 import sys
 import json
 from district_helper import load_data, assign_districts
+from send_mail import send_crash_summary
 
 try:
-    latest_data_file = "data/latest_collisions.csv"
+    latest_data_file = "../data/latest_collisions.csv"
     df_existing = pd.read_csv(latest_data_file, usecols=["collision_id"])
     latest_collision_id = df_existing["collision_id"].max()  # Get latest ID
     print(latest_collision_id)
@@ -35,13 +36,13 @@ try:
     print(f"Date range: {df['crash_date'].min()} to {df['crash_date'].max()}")
     print(f"Boroughs represented: {df['borough'].unique().tolist()}")
     
-    output_file = 'data/latest_collisions.csv'
+    output_file = '../data/latest_collisions.csv'
     df.to_csv(output_file, index=False)
     print(f"Data saved to {output_file}")
 
      # Assign districts using district_helper
-    collision_file = 'data/latest_collisions.csv'
-    boundary_file = 'data/city_council_boundaries.csv'
+    collision_file = '../data/latest_collisions.csv'
+    boundary_file = '../data/city_council_boundaries.csv'
     
     try:
         collisions_gdf, boundaries_gdf = load_data(collision_file, boundary_file)
@@ -65,7 +66,9 @@ try:
         'total_killed': df['number_of_persons_killed'].sum(),
         'boroughs': df['borough'].value_counts().to_dict()
     }
-    
+
+    send_crash_summary(summary)
+
     with open(f'summary_{today}.json', 'w') as f:
         json.dump(summary, f, indent=2)
         
