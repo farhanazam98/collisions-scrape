@@ -1,6 +1,6 @@
 import json
 import sys
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import pandas as pd
 from district_helper import assign_districts, load_data
@@ -8,17 +8,12 @@ from send_mail import send_crash_summary
 from sodapy import Socrata
 
 try:
-    latest_data_file = "./data/latest_collisions.csv"
-    df_existing = pd.read_csv(latest_data_file, usecols=["collision_id"])
-    latest_collision_id = df_existing["collision_id"].max()  # Get latest ID
-    print(latest_collision_id)
-
     client = Socrata("data.cityofnewyork.us", None)
 
     today = datetime.now().strftime("%Y-%m-%d")
 
-    initial_date = "2025-02-11"
-    query = f"SELECT * WHERE collision_id > {latest_collision_id} ORDER BY crash_date DESC LIMIT 1000"
+    seven_days_ago = (datetime.now() - timedelta(days=7)).strftime("%Y-%m-%d")
+    query = f"SELECT * WHERE crash_date >= '{seven_days_ago}' ORDER BY crash_date DESC LIMIT 1000"
 
     results = client.get("h9gi-nx95", query=query)
 
