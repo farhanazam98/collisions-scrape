@@ -1,10 +1,3 @@
-name: NYC Collision Data Scraper
-
-on:
-  schedule:
-    - cron: '0 0 * * *'  # still midnight
-  workflow_dispatch:      # mostly for testing
-
 jobs:
   scrape:
     runs-on: ubuntu-latest
@@ -28,8 +21,10 @@ jobs:
         pip install -r requirements.txt
 
     - name: Run scraper
+      env:
+        GMAIL_EMAIL: ${{ secrets.GMAIL_EMAIL }}
+        APP_PASSWORD: ${{ secrets.APP_PASSWORD }}
       run: |
-        # put in new csv
         python scripts/scrape.py
 
     - name: Commit and push if changes
