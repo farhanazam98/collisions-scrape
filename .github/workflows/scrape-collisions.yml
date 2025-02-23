@@ -28,8 +28,7 @@ jobs:
 
     - name: Run scraper
       run: |
-        # remove old csv and put in new one
-        rm -f ./data/latest_collisions.csv
+        # put in new csv
         python scripts/scrape.py
 
     - name: Commit and push if changes
