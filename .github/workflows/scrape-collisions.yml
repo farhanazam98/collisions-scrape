@@ -29,12 +29,12 @@ jobs:
     - name: Run scraper
       run: |
         # remove old csv and put in new one
-        rm -f ./data/latest_collisions.csv
+        rm -f data/latest_collisions.csv
         python scripts/scrape.py
 
     - name: Commit and push if changes
       run: |
         git config --local user.email "github-actions[bot]@users.noreply.github.com"
         git config --local user.name "github-actions[bot]"
-        git add latest_collisions.csv
+        git add -u .
         git diff --quiet && git diff --staged --quiet || (git commit -m "Update collision data $(date +'%Y-%m-%d %H:%M:%S')" && git push)
