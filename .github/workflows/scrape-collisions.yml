@@ -29,7 +29,7 @@ jobs:
 
     - name: Run scraper
       env:
-        GMAIL_EMAIL: ${{ secrets.GMAIL_EMAIL }}
+        GMAIL_EMAIL: ${{ vars.GMAIL_EMAIL }}
         APP_PASSWORD: ${{ secrets.APP_PASSWORD }}
       run: |
         python scripts/scrape.py
