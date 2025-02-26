@@ -6,9 +6,9 @@ from email.mime.text import MIMEText
 from dotenv import load_dotenv
 
 RECIPIENTS = [
-    "farhanazam98@outlook.com",
+    # "farhanazam98@outlook.com",
     "mynameisdeb.m@gmail.com",
-    "mzoorob@gmail.com",
+    # "mzoorob@gmail.com",
 ]
 
 
@@ -19,12 +19,6 @@ def generate_email():
     load_dotenv()
     SENDER_EMAIL = os.getenv("GMAIL_EMAIL")
     SENDER_PASSWORD = os.getenv("APP_PASSWORD")
-
-    RECIPIENTS = [
-        "farhanazam98@outlook.com",
-        "mynameisdeb.m@gmail.com",
-        "mzoorob@gmail.com",
-    ]
 
     # Create email
     today = datetime.now().strftime("%Y-%m-%d")
@@ -109,16 +103,22 @@ def send_injury_email(df, council_district):
 def send_crash_summary_email(summary):
     generate_email()
 
-    today = datetime.now().strftime("%Y-%m-%d")
-    earliest_date = summary["date_range"]["earliest"]
-    latest_date = summary["date_range"]["latest"]
+    today = datetime.now().strftime("%B %d, %Y")
+    earliest_date = datetime.strptime(
+        summary["date_range"]["earliest"], "%Y-%m-%dT%H:%M:%S.%f"
+    ).strftime("%A, %B %d, %Y")
+    latest_date = datetime.strptime(
+        summary["date_range"]["latest"], "%Y-%m-%dT%H:%M:%S.%f"
+    ).strftime("%A, %B %d, %Y")
+    print(earliest_date, latest_date)
     total_crashes = summary["record_count"]
 
     msg = MIMEText(
-        f"""Hello,
+        f"""
+    Hello,
 
     This is a summary of collisions in New York City for {today}.
-    The total number of crashes between {earliest_date} and {latest_date} was {total_crashes}"""
+    The total number of crashes between {earliest_date} and {latest_date} was {total_crashes}."""
     )
 
     msg["Subject"] = f"New York Collision Summary for {today}"
