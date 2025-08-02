@@ -6,9 +6,7 @@ from email.mime.text import MIMEText
 from dotenv import load_dotenv
 
 RECIPIENTS = [
-    "farhanazam98@outlook.com",
-    "mynameisdeb.m@gmail.com",
-    "mzoorob@gmail.com",
+    "farhanazam98@outlook.com", 
 ]
 
 
