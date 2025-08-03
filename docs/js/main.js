@@ -7,11 +7,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const csvUrl = 'https://raw.githubusercontent.com/farhanazam98/collisions-scrape/main/data/latest_collisions.csv';
     let markers = L.layerGroup().addTo(map);
     let collisionsData = [];
+    let mostRecentCrashDate = null
 
     function isWithinTimeRange(dateStr, daysAgo) {
         const crashDate = new Date(dateStr);
         const startDate = new Date();
-        startDate.setDate(startDate.getDate() - daysAgo);
+        if (!mostRecentCrashDate || crashDate > mostRecentCrashDate) {
+            mostRecentCrashDate = crashDate;
+            document.getElementById('mostRecentCrashDate').textContent = mostRecentCrashDate.toLocaleDateString();
+        }
+        startDate.setDate(startDate.getDate() - daysAgo);        
         return crashDate >= startDate;
     }
 
@@ -42,10 +47,11 @@ document.addEventListener('DOMContentLoaded', () => {
             skipEmptyLines: 'greedy',
             complete: res => {
                 collisionsData = Array.isArray(res.data) ? res.data : [];
-                updateMap(1); 
+                updateMap(7); 
 
                 const slider = document.getElementById('timeRange');
                 const daysLabel = document.getElementById('daysLabel');
+                const mostRecentCrashDateLabel = document.getElementById('mostRecentCrashDate');
                 
                 slider.addEventListener('input', (e) => {
                     const daysAgo = parseInt(e.target.value * -1); 
