@@ -5,6 +5,7 @@
 <title>NYC Motor Vehicle Collisions Map</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="https://unpkg.com/nouislider@15.7.1/dist/nouislider.min.css">
 <style>
 html,body,#map{height:100%;margin:0}
 h1{
@@ -27,10 +28,15 @@ h1{
         left: 50%;
         transform: translateX(-50%);
         background: #fff;
-        padding: 15px;
+        padding: 15px 25px;
         border-radius: 6px;
         font-family: system-ui, Arial;
         box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        min-width: 300px;
+    }
+#slider {
+        margin: 20px 10px;
+        height: 20px;
     }
 </style>
 </head>
@@ -38,12 +44,13 @@ h1{
 <h1>NYC Motor Vehicle Collisions Map</h1>
 <div id="status">Loading…</div>
 <div class="controls">
-    <label for="timeRange">Show crashes starting from: <span id="daysLabel">7</span> days ago until <span id="mostRecentCrashDate"></span></label>
-    <input type="range" id="timeRange" min="-7" max="-1" value="-7" step="1">
+    <label>Show crashes from <span id="startLabel">7</span> days ago to <span id="endLabel">1</span> day ago</label>
+    <div id="slider"></div>
 </div>
 <div id="map"></div>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/papaparse@5.4.1/papaparse.min.js"></script>
+<script src="https://unpkg.com/nouislider@15.7.1/dist/nouislider.min.js"></script>
 <script src="js/main.js"></script>
 </body>
 </html>

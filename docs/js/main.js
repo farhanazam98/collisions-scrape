@@ -9,21 +9,27 @@ document.addEventListener('DOMContentLoaded', () => {
     let collisionsData = [];
     let mostRecentCrashDate = null
 
-    function isWithinTimeRange(dateStr, daysAgo) {
+    function isWithinTimeRange(dateStr, startDays, endDays) {
         const crashDate = new Date(dateStr);
         const startDate = new Date();
+        const endDate = new Date();
+        
         if (!mostRecentCrashDate || crashDate > mostRecentCrashDate) {
             mostRecentCrashDate = crashDate;
-            document.getElementById('mostRecentCrashDate').textContent = mostRecentCrashDate.toLocaleDateString();
+            // document.getElementById('mostRecentCrashDate').textContent = mostRecentCrashDate.toLocaleDateString();
         }
-        startDate.setDate(startDate.getDate() - daysAgo);        
-        return crashDate >= startDate;
+        
+        startDate.setDate(startDate.getDate() - startDays);
+        endDate.setDate(endDate.getDate() - endDays);
+        return crashDate >= startDate && crashDate <= endDate;
     }
 
-    function updateMap(daysAgo) {
+    function updateMap(startDays, endDays) {
         markers.clearLayers();
         
-        const filteredRows = collisionsData.filter(row => isWithinTimeRange(row.crash_date, daysAgo));
+        const filteredRows = collisionsData.filter(row => 
+            isWithinTimeRange(row.crash_date, startDays, endDays)
+        );
         
         filteredRows.forEach(row => {
             if (row.latitude && row.longitude) {
@@ -35,7 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         document.getElementById('status').textContent =
-        `Showing ${filteredRows.length} crashes from the last ${daysAgo} days (out of ${collisionsData.length} total)`;
+            `Showing ${filteredRows.length} crashes from ${startDays} to ${endDays} days ago (out of ${collisionsData.length} total)`;
     }
 
     function loadCsv() {
@@ -47,17 +53,26 @@ document.addEventListener('DOMContentLoaded', () => {
             skipEmptyLines: 'greedy',
             complete: res => {
                 collisionsData = Array.isArray(res.data) ? res.data : [];
-                updateMap(7); 
-
-                const slider = document.getElementById('timeRange');
-                const daysLabel = document.getElementById('daysLabel');
-                const mostRecentCrashDateLabel = document.getElementById('mostRecentCrashDate');
                 
-                slider.addEventListener('input', (e) => {
-                    const daysAgo = parseInt(e.target.value * -1); 
-                    daysLabel.textContent = daysAgo;
-                    updateMap(daysAgo);
+                const slider = document.getElementById('slider');
+                noUiSlider.create(slider, {
+                    start: [-7, -1],
+                    connect: true,
+                    step: 1,
+                    range: {
+                        'min': -7,
+                        'max': -1
+                    }
                 });
+
+                slider.noUiSlider.on('update', (values) => {
+                    const [startDays, endDays] = values.map(v => Math.round(v));
+                    document.getElementById('startLabel').textContent = startDays;
+                    document.getElementById('endLabel').textContent = endDays;
+                    updateMap(Math.abs(startDays), Math.abs(endDays));
+                });
+                
+                updateMap(7, 1);
             },
             error: err => {
                 document.getElementById('status').textContent = 'Error loading CSV';
