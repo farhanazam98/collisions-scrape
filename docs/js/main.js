@@ -7,17 +7,45 @@ document.addEventListener('DOMContentLoaded', () => {
     const csvUrl = 'https://raw.githubusercontent.com/farhanazam98/collisions-scrape/main/data/latest_collisions.csv';
     let markers = L.layerGroup().addTo(map);
     let collisionsData = [];
-    let mostRecentCrashDate = null
+    let oldestCrashDate = null;
+    let newestCrashDate = null;
+
+    function getDaysAgo(date) {
+        const now = new Date();
+        const diffTime = now - date;
+        return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    }
+
+    function findDateBoundaries(data) {
+        if (!data.length) {
+            return {
+                oldest: null,
+                newest: null,
+                oldestDaysAgo: null,
+                newestDaysAgo: null
+            };
+        }
+        let oldest = new Date(data[0].crash_date);
+        let newest = new Date(data[0].crash_date);
+        
+        data.forEach(row => {
+            const crashDate = new Date(row.crash_date);
+            if (crashDate < oldest) oldest = crashDate;
+            if (crashDate > newest) newest = crashDate;
+        });
+        
+        return {
+            oldest: oldest,
+            newest: newest,
+            oldestDaysAgo: getDaysAgo(oldest),
+            newestDaysAgo: getDaysAgo(newest)
+        };
+    }
 
     function isWithinTimeRange(dateStr, startDays, endDays) {
         const crashDate = new Date(dateStr);
         const startDate = new Date();
         const endDate = new Date();
-        
-        if (!mostRecentCrashDate || crashDate > mostRecentCrashDate) {
-            mostRecentCrashDate = crashDate;
-            // document.getElementById('mostRecentCrashDate').textContent = mostRecentCrashDate.toLocaleDateString();
-        }
         
         startDate.setDate(startDate.getDate() - startDays);
         endDate.setDate(endDate.getDate() - endDays);
@@ -53,6 +81,9 @@ document.addEventListener('DOMContentLoaded', () => {
             skipEmptyLines: 'greedy',
             complete: res => {
                 collisionsData = Array.isArray(res.data) ? res.data : [];
+                const boundaries = findDateBoundaries(collisionsData);
+                oldestCrashDate = boundaries.oldest;
+                newestCrashDate = boundaries.newest;
                 
                 const slider = document.getElementById('slider');
                 noUiSlider.create(slider, {
@@ -60,19 +91,21 @@ document.addEventListener('DOMContentLoaded', () => {
                     connect: true,
                     step: 1,
                     range: {
-                        'min': -7,
-                        'max': -1
+                        'min': -boundaries.oldestDaysAgo,
+                        'max': -boundaries.newestDaysAgo
                     }
                 });
 
                 slider.noUiSlider.on('update', (values) => {
                     const [startDays, endDays] = values.map(v => Math.round(v));
-                    document.getElementById('startLabel').textContent = startDays;
-                    document.getElementById('endLabel').textContent = endDays;
+                    document.getElementById('startLabel').textContent = Math.abs(startDays);
+                    document.getElementById('endLabel').textContent = Math.abs(endDays);
                     updateMap(Math.abs(startDays), Math.abs(endDays));
                 });
                 
-                updateMap(7, 1);
+                const initialEnd = boundaries.newestDaysAgo;
+                const initialStart = Math.min(initialEnd + 7, boundaries.oldestDaysAgo);
+                updateMap(initialStart, initialEnd);
             },
             error: err => {
                 document.getElementById('status').textContent = 'Error loading CSV';
