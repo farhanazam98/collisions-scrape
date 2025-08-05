@@ -6,9 +6,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const csvUrl = 'https://raw.githubusercontent.com/farhanazam98/collisions-scrape/main/data/latest_collisions.csv';
     let markers = L.layerGroup().addTo(map);
+    let councilDistricts;
     let collisionsData = [];
     let oldestCrashDate = null;
     let newestCrashDate = null;
+
+    // Add council districts layer
+    fetch('../data/city_council_district_geo.json')
+        .then(response => response.json())
+        .then(data => {
+            councilDistricts = L.geoJSON(data, {
+                style: {
+                    color: '#2c3e50',
+                    weight: 2,
+                    opacity: 0.8,
+                    fillOpacity: 0.4
+                },
+                onEachFeature: (feature, layer) => {
+                    layer.bindPopup(`Council District: ${feature.properties.CounDist}`);
+                }
+            }).addTo(map);
+        })
+        .catch(err => console.error('Error loading council districts:', err));
 
     function getDaysAgo(date) {
         const now = new Date();
