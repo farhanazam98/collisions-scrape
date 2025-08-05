@@ -85,9 +85,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 oldestCrashDate = boundaries.oldest;
                 newestCrashDate = boundaries.newest;
                 
+                // Initialize number input handler
+                const numberInput = document.getElementById('numberInput');
+                numberInput.addEventListener('change', (e) => {
+                    const value = parseInt(e.target.value);
+                    if (value >= 1 && value <= 51) {
+                        console.log('Selected number:', value);
+                        // Add your logic here for handling the number change
+                    }
+                });
+                
                 const slider = document.getElementById('slider');
                 noUiSlider.create(slider, {
-                    start: [-7, -1],
+                    start: [-boundaries.oldestDaysAgo, -boundaries.newestDaysAgo],
                     connect: true,
                     step: 1,
                     range: {
@@ -103,9 +113,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     updateMap(Math.abs(startDays), Math.abs(endDays));
                 });
                 
-                const initialEnd = boundaries.newestDaysAgo;
-                const initialStart = Math.min(initialEnd + 7, boundaries.oldestDaysAgo);
-                updateMap(initialStart, initialEnd);
+                // Initialize with all available data
+                updateMap(boundaries.oldestDaysAgo, boundaries.newestDaysAgo);
             },
             error: err => {
                 document.getElementById('status').textContent = 'Error loading CSV';

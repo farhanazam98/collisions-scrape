@@ -38,11 +38,34 @@ h1{
         margin: 20px 10px;
         height: 20px;
     }
+.number-control {
+    position: absolute;
+    z-index: 1000;
+    top: 20px;
+    right: 20px;
+    background: #fff;
+    padding: 15px;
+    border-radius: 6px;
+    font-family: system-ui, Arial;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.number-control input[type="number"] {
+    width: 60px;
+    padding: 5px;
+    margin-left: 10px;
+}
 </style>
 </head>
 <body>
 <h1>NYC Motor Vehicle Collisions Map</h1>
 <div id="status">Loading…</div>
+
+<div class="number-control">
+    <label for="numberInput">Select number (1-51):</label>
+    <input type="number" id="numberInput" min="1" max="51" value="1">
+</div>
+
 <div class="controls">
     <label>Show crashes from <span id="startLabel">7</span> days ago to <span id="endLabel">1</span> day ago</label>
     <div id="slider"></div>
