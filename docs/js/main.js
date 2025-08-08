@@ -6,6 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const csvUrl = 'https://raw.githubusercontent.com/farhanazam98/collisions-scrape/main/data/latest_collisions.csv';
     let markers = L.markerClusterGroup().addTo(map);
+    let markersNoCluster = L.layerGroup();
     let currentDistrict = null;
     let councilDistricts;
     let collisionsData = [];
@@ -94,22 +95,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function updateMap(startDays, endDays) {
         markers.clearLayers();
+        markersNoCluster.clearLayers();
         
         const filteredRows = collisionsData.filter(row => 
             isWithinTimeRange(row.crash_date, startDays, endDays)
         );
+        
+        const activeLayer = document.getElementById('clusterToggle').checked ? markers : markersNoCluster;
         
         filteredRows.forEach(row => {
             if (row.latitude && row.longitude) {
                 const marker = L.marker([row.latitude, row.longitude]);
                 const date = new Date(row.crash_date).toLocaleDateString();
                 marker.bindPopup(`Crash Date: ${date}`);
-                marker.addTo(markers);
+                marker.addTo(activeLayer);
             }
         });
 
+        if (document.getElementById('clusterToggle').checked) {
+            map.removeLayer(markersNoCluster);
+            map.addLayer(markers);
+        } else {
+            map.removeLayer(markers);
+            map.addLayer(markersNoCluster);
+        }
+
         document.getElementById('status').textContent =
-            `Dsiplaying ${filteredRows.length} crashes total`;
+            `Displaying ${filteredRows.length} crashes total`;
     }
 
     function loadCsv() {
@@ -151,6 +163,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     document.getElementById('startLabel').textContent = Math.abs(startDays);
                     document.getElementById('endLabel').textContent = Math.abs(endDays);
                     updateMap(Math.abs(startDays), Math.abs(endDays));
+                });
+                
+                document.getElementById('clusterToggle').addEventListener('change', () => {
+                    updateMap(
+                        Math.abs(slider.noUiSlider.get()[0]),
+                        Math.abs(slider.noUiSlider.get()[1])
+                    );
                 });
                 
                 // Initialize with all available data
