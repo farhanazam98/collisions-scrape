@@ -4,7 +4,7 @@
 
 A tool to track and visualize motor vehicle collision hotspots across New York City by City Council district. 
 
-**[Demo](https://farhanazam98.github.io/collisions-scrape/)**
+**[Demo](https://farhanazam98.github.io/nyc-collision-map/)**
 
 ![Screenshot](assets/screenshot.png)
 
