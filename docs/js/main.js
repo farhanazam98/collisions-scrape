@@ -109,7 +109,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         document.getElementById('status').textContent =
-            `Showing ${filteredRows.length} crashes from ${startDays} to ${endDays} days ago (out of ${collisionsData.length} total)`;
+            `Dsiplaying ${filteredRows.length} crashes total`;
     }
 
     function loadCsv() {

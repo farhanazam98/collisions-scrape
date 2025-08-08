@@ -8,67 +8,91 @@
 <link rel="stylesheet" href="https://unpkg.com/nouislider@15.7.1/dist/nouislider.min.css">
 <style>
 html,body,#map{height:100%;margin:0}
-h1{
-    position:absolute;
-    z-index:1000;
-    top:12px;
-    left:50%;
-    transform:translateX(-50%);
-    background:#fff;
-    padding:6px 10px;
-    border-radius:6px;
-    font-family:system-ui,Arial;
-    box-shadow:0 2px 8px rgba(0,0,0,0.08);
-    text-align:center;
-}
-.controls {
-        position: absolute;
-        z-index: 1000;
-        bottom: 20px;
-        left: 50%;
-        transform: translateX(-50%);
-        background: #fff;
-        padding: 15px 25px;
-        border-radius: 6px;
-        font-family: system-ui, Arial;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-        min-width: 300px;
-    }
-#slider {
-        margin: 20px 10px;
-        height: 20px;
-    }
-.number-control {
+h1 {
     position: absolute;
     z-index: 1000;
-    top: 20px;
-    right: 20px;
+    top: 12px;
+    left: 50%;
+    transform: translateX(-50%);
     background: #fff;
-    padding: 15px;
+    padding: 6px 10px;
     border-radius: 6px;
     font-family: system-ui, Arial;
     box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    text-align: center;
+    font-size: 18px;
+    margin: 0;
 }
 
-.number-control input[type="number"] {
+.left-panel {
+    position: absolute;
+    z-index: 1000;
+    left: 0px;
+    top: 100px;
+    width: 300px;
+    background: rgba(255,255,255,0.7);
+    padding: 20px;
+    box-shadow: 2px 0 8px rgba(0,0,0,0.08);
+    overflow-y: auto;
+}
+
+.panel-section {
+    margin-bottom: 20px;
+}
+
+.panel-section h2 {
+    font-size: 16px;
+    margin: 0 0 10px 0;
+}
+
+
+#slider {
+    margin: 15px 5px 35px 5px;  /* increased bottom margin for pips */
+    height: 20px;
+}
+
+/* Style the pips */
+.noUi-pips {
+    font-size: 12px;
+}
+
+.noUi-marker {
+    background: #999;
+}
+
+.noUi-value {
+    color: #666;
+}
+
+input[type="number"] {
     width: 60px;
     padding: 5px;
-    margin-left: 10px;
+    margin-top: 5px;
+}
+
+#status {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
 }
 </style>
 </head>
 <body>
 <h1>NYC Motor Vehicle Collisions Map</h1>
-<div id="status">Loading…</div>
+<div class="left-panel">
+    <div class="panel-section">
+        <h2>Select District</h2>
+        <label for="numberInput">Council District (1-51):</label><br>
+        <input type="number" id="numberInput" min="1" max="51" value="0">
+    </div>
 
-<div class="number-control">
-    <label for="numberInput">Select a city council district number (1-51):</label>
-    <input type="number" id="numberInput" min="1" max="51" value="0">
-</div>
+    <div class="panel-section">
+        <h2>Time Range</h2>
+        <label>Show crashes from <span id="startLabel">7</span> days ago to <span id="endLabel">1</span> days ago</label>
+        <div id="slider"></div>
+    </div>
 
-<div class="controls">
-    <label>Show crashes from <span id="startLabel">7</span> days ago to <span id="endLabel">1</span> day ago</label>
-    <div id="slider"></div>
+    <div id="status">Loading…</div>
 </div>
 <div id="map"></div>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
