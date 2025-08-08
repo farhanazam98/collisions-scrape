@@ -18,17 +18,17 @@ document.addEventListener('DOMContentLoaded', () => {
             map.removeLayer(councilDistricts);
         }
         
-        fetch('../data/city_council_district_geo.json')
+        fetch('https://raw.githubusercontent.com/farhanazam98/collisions-scrape/main/data/city_council_district_geo.json')
             .then(response => response.json())
             .then(data => {
-                // Filter for selected district
+                // Filter for selected district - ensure number comparison
                 const filteredData = {
                     ...data,
                     features: data.features.filter(f => 
-                        f.properties.CounDist === districtNum
+                        Number(f.properties.CounDist) === Number(districtNum)
                     )
                 };
-                
+
                 councilDistricts = L.geoJSON(filteredData, {
                     style: {
                         color: '#2c3e50',
