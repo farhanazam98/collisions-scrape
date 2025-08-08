@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }).addTo(map);
 
     const csvUrl = 'https://raw.githubusercontent.com/farhanazam98/collisions-scrape/main/data/latest_collisions.csv';
-    let markers = L.layerGroup().addTo(map);
+    let markers = L.markerClusterGroup().addTo(map);
     let currentDistrict = null;
     let councilDistricts;
     let collisionsData = [];
